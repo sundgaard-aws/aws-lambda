@@ -6,6 +6,8 @@ const { randomUUID } = require('crypto');
 exports.handler = async (event) => {
     logInput(event);
     var targetQueueURL =  process.env.targetQueueURL;    
+    
+    // The GUID approach is not recommended/intended for production use. Extract dedup ID from your event/message instead, or have Lambda hash the contents for you using the appropriate setting
     var guid = randomUUID();
     const groupId = "GroupA";
 
