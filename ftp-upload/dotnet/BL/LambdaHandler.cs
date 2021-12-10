@@ -9,7 +9,7 @@ namespace LambdaFunction
     {
         [LambdaSerializer(typeof(JsonSerializer))]
         public object handleRequest(Stream inputStream)
-        {            
+        {
             uploadFile();
             var response = new
             {
@@ -42,7 +42,18 @@ namespace LambdaFunction
                 client.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
                 createLocalDummFile(localFilePath);
                 System.Console.WriteLine($"Local file created.");
-                client.UploadFile(targetFTPPath, WebRequestMethods.Ftp.UploadFile, localFilePath);
+                //client.UploadFile(new System.Uri(targetFTPPath), WebRequestMethods.Ftp.UploadFile, localFilePath);
+                //client.(targetFTPPath, WebRequestMethods.Ftp.ListDirectory);
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(targetFTPPath);
+                request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                request.Method = WebRequestMethods.Ftp.UploadFile;
+                request.Method = WebRequestMethods.Ftp.UploadFile;
+                request.UsePassive=false;
+                using (Stream fileStream = File.OpenRead(localFilePath))
+                using (Stream ftpStream = request.GetRequestStream())
+                {
+                    fileStream.CopyTo(ftpStream);
+                }
                 System.Console.WriteLine($"File uploaded to FTP server.");
             }
         }
