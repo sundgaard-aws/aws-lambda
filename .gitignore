@@ -1,4 +1,7 @@
 node_modules
 bin
+obj
 build
 local
+zip
+publish-libs
