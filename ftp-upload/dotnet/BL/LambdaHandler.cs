@@ -2,14 +2,27 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.Json;
 using System.IO;
 using System.Net;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace LambdaFunction
 {
     public class LambdaHandler
     {
-        [LambdaSerializer(typeof(JsonSerializer))]
-        public object handleRequest(Stream inputStream)
-        {
+        /*public LambdaHandler(ILogger<LambdaHandler> logger, ILoggerFactory loggerFactory) {
+            if(logger != null) System.Console.WriteLine("logger is available");
+            if(loggerFactory != null) System.Console.WriteLine("loggerFactory is available");
+        }*/
+        private ILambdaLogger logger;
+        [LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+        public object handleRequest(Stream inputStream, ILambdaContext context)
+        {  
+            if(context != null) logger = context.Logger;
+            else logger = new LocalLambdaLogger();
+            //context.ClientContext.
+            //context.ClientContext.Environment;
+            //context.ClientContext.
+            logger.LogLine("This is information");
             uploadFile();
             var response = new
             {
@@ -42,13 +55,26 @@ namespace LambdaFunction
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(targetFTPPath);
             request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
             request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.UsePassive=false;
-            using (Stream fileStream = File.OpenRead(localFilePath))
-            using (Stream ftpStream = request.GetRequestStream())
-            {
-                fileStream.CopyTo(ftpStream);
-            }
+            request.UsePassive=true;
+            request.KeepAlive = false;
+            try {
+                using (Stream fileStream = File.OpenRead(localFilePath))
+                using (Stream ftpStream = request.GetRequestStream())
+                {                
+                    fileStream.CopyTo(ftpStream);
+                }    
+            }    
+            catch(WebException webex) {
+                if(webex.InnerException != null) logger.LogLine($"Inner=[{webex.InnerException.Message}]");
+                logger.LogLine($"Message=[{webex.Message}]");
+                if(webex.Response != null) {
+                    StreamReader sr = new StreamReader(webex.Response.GetResponseStream());
+                    var response = sr.ReadToEnd();
+                    logger.LogLine($"Response=[{response}]");
+                }
+                logger.LogLine($"HelpLink=[{webex.HelpLink}]");
+                logger.LogLine($"HResult=[{webex.HResult}]");
+            }    
             System.Console.WriteLine($"File uploaded to FTP server.");
         }
     }

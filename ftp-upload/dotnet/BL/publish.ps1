@@ -1,0 +1,1 @@
+dotnet publish /p:GenerateRuntimeConfigurationFiles=true

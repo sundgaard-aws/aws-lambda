@@ -4,10 +4,15 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="2.0.0" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0"/>
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="2.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0"/>
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.74"/>
+    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.257301"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BL\LambdaFunction.csproj" />
+    <ProjectReference Include="..\BL\LambdaFunction.csproj"/>
   </ItemGroup>
 </Project>
