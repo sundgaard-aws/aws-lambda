@@ -6,6 +6,6 @@
     "function-runtime": "dotnetcore3.1",
     "function-memory-size": 128,
     "function-timeout": 30,
-    "function-handler": "LambdaFunction::LambdaFunction.LambdaHandler::handleRequest",
+    "function-handler": "SL::LambdaFunction.LambdaHandler::handleRequest",
     "function-name": "erp-ftp-upload"
 }
