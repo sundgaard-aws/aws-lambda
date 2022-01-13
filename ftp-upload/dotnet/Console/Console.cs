@@ -12,6 +12,7 @@ using Microsoft.Diagnostics.Tracing.Parsers;
 using System.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing;
 using System.Linq;
+using System.IO;
 
 public class Console {
     public static void Main(string[] args) {
@@ -38,7 +39,8 @@ public class Console {
         var classLogger = serviceProvider.GetService<ILogger<LambdaHandler>>();
 
         logger.LogInformation("Started");
-        lambdaHandler.handleRequest(null, null);
+        string path = "../local/sample-sqs-message.json";
+        lambdaHandler.handleRequest(new FileStream(path, FileMode.Open), null);
         logger.LogInformation("Ended.");
     }
 }
