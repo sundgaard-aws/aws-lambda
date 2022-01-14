@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <DefaultNamespace>BL</DefaultNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.7.12" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.1.68" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.7.7.12"/>
+    <ProjectReference Include="..\DTL\DTL.csproj" />
   </ItemGroup>
 </Project>

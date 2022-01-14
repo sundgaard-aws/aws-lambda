@@ -31,7 +31,15 @@ namespace LambdaFunction
             logger.LogLine($"object key [{objectKey}]");
             string s3ObjectContents = await S3Facade.GetS3ObjectContents(bucketName, objectKey);
             logger.LogLine($"object contents:\n{s3ObjectContents}");
-            FTPFacade.uploadData(s3ObjectContents);
+            var ftpSecretId = System.Environment.GetEnvironmentVariable("ftpSecretId");
+            if (string.IsNullOrEmpty(ftpSecretId)) throw new System.Exception("Please define an environment variable for [ftpSecretId]");
+            var ftpTargetFileName = System.Environment.GetEnvironmentVariable("ftpTargetFileName");
+            if (string.IsNullOrEmpty(ftpTargetFileName)) throw new System.Exception("Please define an environment variable for [ftpTargetFileName]");
+            var rawSecret = SecretsManagerFacade.GetSecret(ftpSecretId);            
+            logger.LogLine($"raw secret:\n{rawSecret}");
+            var ftpSecret = JsonConvert.DeserializeObject<FTPSecret>(rawSecret);
+            logger.LogLine($"ftp login [{ftpSecret.Login}]");
+            FTPFacade.uploadData(s3ObjectContents, ftpTargetFileName, ftpSecret);
             var response = new
             {
                 body = "You just called a dotnet Lambda handler",
