@@ -17,9 +17,9 @@ Obviously you can choose to hardcode the below or use another configuration mana
 
 ``` ps
 $Env:localFilePath="../local/<file-to-upload>.csv"
-$Env:targetFTPPath="ftp://<hostname or ip>:21/<file-to-upload>.csv"
-$Env:ftpUsername="<ftp-user>"
-$Env:ftpPassword="<ftp-pw>"
+$Env:ftpTargetFileName=""
+$Env:ftpSecretId="arn:aws:secretsmanager:<region>:<accid>:<secret-id>"
+$Env:ftpTargetFileName="data.csv"
 $Env:usePassiveFTP="<true or false>"
 ```
 
