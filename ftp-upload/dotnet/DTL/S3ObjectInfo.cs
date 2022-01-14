@@ -1,4 +1,4 @@
-namespace LambdaFunction
+namespace DTL
 {
     public class S3ObjectInfo
     {

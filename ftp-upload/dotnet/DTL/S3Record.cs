@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace LambdaFunction
+namespace DTL
 {
     public class S3Record
     {

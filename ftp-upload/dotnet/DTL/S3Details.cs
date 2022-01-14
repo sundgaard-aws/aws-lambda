@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace LambdaFunction
+namespace DTL
 {
     public class S3Details
     {

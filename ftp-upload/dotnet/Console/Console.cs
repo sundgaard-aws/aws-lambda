@@ -40,7 +40,8 @@ public class Console {
 
         logger.LogInformation("Started");
         string path = "../local/sample-sqs-message.json";
-        lambdaHandler.handleRequest(new FileStream(path, FileMode.Open), null);
+        object response = lambdaHandler.handleRequest(new FileStream(path, FileMode.Open), null).ConfigureAwait(false).GetAwaiter().GetResult();
+        logger.LogInformation(response.ToString());
         logger.LogInformation("Ended.");
     }
 }
