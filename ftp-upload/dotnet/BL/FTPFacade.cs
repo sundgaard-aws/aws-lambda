@@ -32,20 +32,10 @@ namespace BL {
 
         public static void uploadData(Stream dataStream, string targetFileName, FTPSecret ftpSecret)
         {
-            //var localFilePath = System.Environment.GetEnvironmentVariable("localFilePath");
-            //var targetFTPPath = System.Environment.GetEnvironmentVariable("targetFTPPath");
-            //var ftpUsername = System.Environment.GetEnvironmentVariable("ftpUsername");
-            //var ftpPassword = System.Environment.GetEnvironmentVariable("ftpPassword");
             var usePassiveFTP = System.Environment.GetEnvironmentVariable("usePassiveFTP");
-            //if (string.IsNullOrEmpty(localFilePath)) throw new System.Exception("Please define an environment variable for [localFilePath]");
-            //if (string.IsNullOrEmpty(targetFTPPath)) throw new System.Exception("Please define an environment variable for [targetFTPPath]");
-            //if (string.IsNullOrEmpty(ftpUsername)) throw new System.Exception("Please define an environment variable for [ftpUsername]");
-            //if (string.IsNullOrEmpty(ftpPassword)) throw new System.Exception("Please define an environment variable for [ftpPassword]");
             if (string.IsNullOrEmpty(usePassiveFTP)) throw new System.Exception("Please define an environment variable for [usePassiveFTP]");
-            //System.Console.WriteLine($"localFilePath={localFilePath}");
             var targetFilePath = ftpSecret.Host + "/" + targetFileName;
             System.Console.WriteLine($"targetFTPPath={targetFilePath}");
-            //System.Console.WriteLine($"Local file created.");
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(targetFilePath);
             request.Credentials = new NetworkCredential(ftpSecret.Login, ftpSecret.Password);
             request.Method = WebRequestMethods.Ftp.UploadFile;

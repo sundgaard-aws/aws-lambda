@@ -34,7 +34,6 @@ public class Console {
         var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<Console>();
         logger.LogDebug("Starting application");
 
-        //do the actual work here
         var lambdaHandler = serviceProvider.GetService<LambdaHandler>();
         var classLogger = serviceProvider.GetService<ILogger<LambdaHandler>>();
 
