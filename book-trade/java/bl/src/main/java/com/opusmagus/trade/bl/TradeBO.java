@@ -20,9 +20,8 @@ public class TradeBO implements ITradeBO
         this.logger=logger;
     }
     
-    public void BookTrade(TradeDTO trade) {
+    public void BookTrade(TradeDTO trade) throws Exception {
         logger.info("BookTrade started...");
-        System.out.println("BookTrade()");
         tradeDAC.StoreTrade(trade);
         logger.info("BookTrade done.");
     }

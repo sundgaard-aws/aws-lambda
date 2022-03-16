@@ -30,7 +30,12 @@ public class FunctionHandler implements RequestHandler<Map<String,String>, Strin
     //Finally, at runtime we retrieve a GuiceUserService instance with a non-null accountService dependency:
     TradeBO tradeService = injector.getInstance(TradeBO.class);
     TradeDTO newTrade = new TradeDTO();
-    tradeService.BookTrade(newTrade);
+    try {
+      tradeService.BookTrade(newTrade);
+    } catch (Exception e) {
+      e.printStackTrace();
+      response = "501 ERROR";
+    }
     //assertNotNull(guiceUserService.getAccountService());
 
     logger.log("EVENT: " + gson.toJson(event));

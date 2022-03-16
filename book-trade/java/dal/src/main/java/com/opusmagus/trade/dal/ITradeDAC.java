@@ -7,7 +7,7 @@ import com.opusmagus.trade.dtl.TradeDTO;
 public interface ITradeDAC
 {
     TradeDTO RestoreTrade(long tradeId);
-    void StoreTrade(TradeDTO trade);
+    void StoreTrade(TradeDTO trade) throws Exception;
     List<TradeDTO> RestorePage(int startPage, int pageSize);
 }
 
