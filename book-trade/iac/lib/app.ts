@@ -9,7 +9,9 @@ import { DataStack } from './data-stack';
 import { App } from 'aws-cdk-lib';
 
 const app = new App();
-var props = {env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: process.env["CDK_DEFAULT_REGION"] } };
+var region = process.env["CDK_DEFAULT_REGION"];
+region = "eu-west-1"; // override
+var props = {env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region } };
 var metaData = new MetaData();
 
 var networkStack = new NetworkStack(app, MetaData.PREFIX+"network-stack", props);
