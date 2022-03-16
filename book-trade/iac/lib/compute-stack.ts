@@ -43,7 +43,7 @@ export class ComputeStack extends Stack {
     } 
 
     private createBookTradeFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Function {
-        return this.createLambdaFunction(apiSecurityGroup, "login-fn", "index.handler", "../src/api/login", vpc);
+        return this.createLambdaFunction(apiSecurityGroup, "login-fn", "index.handler", "../java/handler-with-guice-di/target/trade-guice-di-handler-1.0-SNAPSHOT.jar", vpc);
     }
     
     private buildAPIRole(): IRole {
