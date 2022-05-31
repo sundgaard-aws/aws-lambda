@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Table, BillingMode, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { IRole } from 'aws-cdk-lib/aws-iam';
@@ -18,8 +18,9 @@ export class DataStack extends Stack {
         new Table(this, name, {
             tableName: name,
             billingMode: BillingMode.PAY_PER_REQUEST,
-            partitionKey: {name: "trade_guid", type: AttributeType.STRING},
-            sortKey: {name: "trade_type", type: AttributeType.STRING}
+            partitionKey: {name: "trade_guid", type: AttributeType.STRING}
+            //,sortKey: {name: "trade_type", type: AttributeType.STRING}
+            ,removalPolicy: RemovalPolicy.DESTROY
         });
     }
 }

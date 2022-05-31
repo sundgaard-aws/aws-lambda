@@ -1,5 +1,6 @@
 package com.opusmagus.trade.handler;
 
+import java.util.Date;
 import java.util.UUID;
 
 import com.google.inject.Guice;
@@ -14,6 +15,8 @@ public class Console {
         TradeBO tradeService = injector.getInstance(TradeBO.class);
         TradeDTO newTrade = new TradeDTO();
         newTrade.TradeGUID = UUID.randomUUID();
+        newTrade.TradeAmount = 100000.00;
+        newTrade.TradeDate = new Date();
         try {
             tradeService.BookTrade(newTrade);
         } catch (Exception e) {

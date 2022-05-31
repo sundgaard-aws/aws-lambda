@@ -40,7 +40,8 @@ public class TradeDAC implements ITradeDAC
 
 
     public void StoreTrade(TradeDTO trade) throws Exception {
-        final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().build(); //.withRegion(Regions.EU_WEST_1).build();
+        //final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().build();
+        final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_WEST_1).build();
         try {
             final Gson gson = new Gson();
             logger.info("AmazonDynamoDB client created....");
@@ -55,7 +56,7 @@ public class TradeDAC implements ITradeDAC
             dynamoItem.withJSON(TRADE_TABLE_NAME, gson.toJson(trade));
             
             logger.info("created item.");
-            //PutItemResult putResult = table.putItem(dynamoItem).getPutItemResult();
+            PutItemResult putResult = table.putItem(dynamoItem).getPutItemResult();
             //table.getItem("trade_guid", "guid", "trade_type", "FXS");
             //logger.info(String.format("item put to table with this result=[%s].", putResult.toString()));
         }
