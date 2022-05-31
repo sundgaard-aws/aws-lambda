@@ -4,7 +4,7 @@ import datetime
 import boto3
 #from io import StringIO
 import fsspec
-#import s3fs
+import s3fs
 import os
 import sys
 
@@ -48,6 +48,7 @@ def lambda_handler(event, context):
     df = df.drop(str(guidB.name))
     df = df.drop(str(guidC.name))
     
+    # Needs fsspec and s3fs import
     df.to_csv("s3://"+bucket+"/fx-trades-large-with-id-cleaned.csv",encoding="UTF-8")
     
     print("data generation ended at ["+str(datetime.datetime.now())+"].")
