@@ -7,12 +7,14 @@ import { IKey } from '@aws-cdk/aws-kms';
 
 export class MessageStack extends Core.Stack {
     private ssmHelper = new SSMHelper();
-    private cmk:IKey;
+    private cmk:IKey;    
+    public PaymentRequestQueue: IQueue;
+    public PaymentResponseQueue: IQueue;
     constructor(scope: Core.Construct, id: string, cmk:IKey, props?: Core.StackProps) {
         super(scope, id, props);
         this.cmk=cmk;
-        this.createPaymentRequestSQSQueue();
-        this.createPaymentResponseSQSQueue();
+        this.PaymentRequestQueue=this.createPaymentRequestSQSQueue();
+        this.PaymentResponseQueue=this.createPaymentResponseSQSQueue();
     }
 
     private createPaymentRequestSQSQueue():IQueue

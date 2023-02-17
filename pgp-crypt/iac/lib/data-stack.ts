@@ -4,39 +4,54 @@ import { IRole } from "@aws-cdk/aws-iam";
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { AttributeType, BillingMode, Table } from '@aws-cdk/aws-dynamodb';
 import { MetaData } from './meta-data';
-import { Bucket } from '@aws-cdk/aws-s3';
-import { Tags } from '@aws-cdk/core';
-import { IKey } from '@aws-cdk/aws-kms';
+import { Bucket, EventType } from '@aws-cdk/aws-s3';
+import { StackProps, Tags } from '@aws-cdk/core';
+import { Alias, IKey, Key } from '@aws-cdk/aws-kms';
+import { v4 } from 'uuid';
+import { IQueue } from '@aws-cdk/aws-sqs';
+import { SqsDestination } from '@aws-cdk/aws-s3-notifications';
+import { hasUncaughtExceptionCaptureCallback } from 'process';
+
+export interface DataStackProps extends StackProps {
+    key: IKey;
+    sqsRequestEventTarget: IQueue;
+    sqsResponseEventTarget: IQueue;
+}
 
 export class DataStack extends Core.Stack {
     private apiRole:IRole;
-    private cmk:IKey;
-    //constructor(scope: Core.Construct, id: string, apiRole: IRole, cmk:IKey, props?: Core.StackProps) {
-    constructor(scope: Core.Construct, id: string, props?: Core.StackProps) {
+    keyAlias: Alias | undefined;
+    private props:DataStackProps;
+    constructor(scope: Core.Construct, id: string, apiRole: IRole, props?: DataStackProps) {
         super(scope, id, props);
-        //this.cmk=cmk;
-        //this.apiRole = apiRole;
-        
+        this.apiRole = apiRole;
+        if(props==undefined) throw("Please make sure that the properties are initialized!");
+        this.props=props;
+        this.keyAlias=props?.key.addAlias(v4().toString());
+
         //this.createLoginTable();
-        //this.createRequestBucket();
-        //this.createResponseBucket();
+        this.createRequestBucket();
+        this.createResponseBucket();
     }
 
     private createRequestBucket() {
         var name = MetaData.PREFIX+"pay-req";
         var bucket = new Bucket(this, name, {
-            bucketName: name, encryptionKey: this.cmk
+            bucketName: name, 
+            encryptionKey: this.keyAlias
         });
         bucket.grantReadWrite(this.apiRole);
+        bucket.addEventNotification(EventType.OBJECT_CREATED, new SqsDestination(this.props.sqsRequestEventTarget));
         Core.Tags.of(bucket).add(MetaData.NAME, name);
     }    
     
     private createResponseBucket() {
         var name = MetaData.PREFIX+"pay-res";
         var bucket = new Bucket(this, name, {
-            bucketName: name, encryptionKey: this.cmk
+            bucketName: name, encryptionKey: this.keyAlias
         });
         bucket.grantReadWrite(this.apiRole);
+        bucket.addEventNotification(EventType.OBJECT_CREATED, new SqsDestination(this.props.sqsRequestEventTarget));
         Core.Tags.of(bucket).add(MetaData.NAME, name);
     }    
     

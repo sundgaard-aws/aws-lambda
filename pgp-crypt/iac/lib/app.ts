@@ -23,8 +23,8 @@ var networkStack = new NetworkStack(app, MetaData.PREFIX+"network-stack", props)
 var securityStack = new SecurityStack(app, MetaData.PREFIX+"security-stack", networkStack.Vpc, props);
 var computeStack = new ComputeStack(app, MetaData.PREFIX+"compute-stack", networkStack.Vpc, securityStack.ApiSecurityGroup, securityStack.ApiRole, securityStack.cmk, props);
 var messageStack = new MessageStack(app, MetaData.PREFIX+"message-stack", securityStack.cmk, props);
-//var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", securityStack.ApiRole, securityStack.cmk, props);
-var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", props);
+var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", securityStack.ApiRole, { env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, key:securityStack.cmk, sqsRequestEventTarget:messageStack.PaymentRequestQueue, sqsResponseEventTarget:messageStack.PaymentResponseQueue });
+//var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", props);
 //var webStack=new WebStack(app, MetaData.PREFIX+"web-stack", props);
 
 //new PipelineStack(app, MetaData.PREFIX+"pipeline-stack");
