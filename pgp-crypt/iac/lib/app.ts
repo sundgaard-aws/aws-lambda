@@ -12,6 +12,7 @@ import { DataStack } from './data-stack';
 import { WebStack } from './web-stack';
 import { MessageStack } from './message-stack';
 import { SecurityStack } from './security-stack';
+import { MediatorStack } from './mediator-stack';
 
 const app = new cdk.App();
 var region=process.env["CDK_DEFAULT_REGION"];
@@ -22,8 +23,19 @@ var metaData = new MetaData();
 var networkStack = new NetworkStack(app, MetaData.PREFIX+"network-stack", props);
 var securityStack = new SecurityStack(app, MetaData.PREFIX+"security-stack", networkStack.Vpc, props);
 var computeStack = new ComputeStack(app, MetaData.PREFIX+"compute-stack", networkStack.Vpc, securityStack.ApiSecurityGroup, securityStack.ApiRole, securityStack.cmk, props);
-var messageStack = new MessageStack(app, MetaData.PREFIX+"message-stack", securityStack.cmk, props);
+var messageStack = new MessageStack(app, MetaData.PREFIX+"message-stack", { env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, key:securityStack.cmk });
+
 var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", securityStack.ApiRole, { env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, key:securityStack.cmk, sqsRequestEventTarget:messageStack.PaymentRequestQueue, sqsResponseEventTarget:messageStack.PaymentResponseQueue });
+var mediatorStack=new MediatorStack(app, MetaData.PREFIX+"mediator-stack", securityStack.ApiRole, { 
+    env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, 
+    key:securityStack.cmk, 
+    sqsRequestEventTarget:messageStack.PaymentRequestQueue, 
+    sqsResponseEventTarget:messageStack.PaymentResponseQueue,
+    paymentRequestBucket: dataStack.PaymentRequestBucket,
+    paymentResponseBucket: dataStack.PaymentResponseBucket
+});
+
+//dataStack.addDependency(messageStack);
 //var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", props);
 //var webStack=new WebStack(app, MetaData.PREFIX+"web-stack", props);
 

@@ -4,15 +4,21 @@ import { IQueue, Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { SSMHelper } from './ssm-helper';
 import * as SSM from '@aws-cdk/aws-ssm';
 import { IKey } from '@aws-cdk/aws-kms';
+import { StackProps } from '@aws-cdk/core';
+import { v4 } from 'uuid';
+
+export interface MessageStackProps extends StackProps {
+    key: IKey;
+}
 
 export class MessageStack extends Core.Stack {
     private ssmHelper = new SSMHelper();
-    private cmk:IKey;    
     public PaymentRequestQueue: IQueue;
     public PaymentResponseQueue: IQueue;
-    constructor(scope: Core.Construct, id: string, cmk:IKey, props?: Core.StackProps) {
+    private keyAlias: IKey | undefined;
+    constructor(scope: Core.Construct, id: string, props?: MessageStackProps) {
         super(scope, id, props);
-        this.cmk=cmk;
+        this.keyAlias=props?.key.addAlias(v4().toString());
         this.PaymentRequestQueue=this.createPaymentRequestSQSQueue();
         this.PaymentResponseQueue=this.createPaymentResponseSQSQueue();
     }
@@ -41,7 +47,7 @@ export class MessageStack extends Core.Stack {
         
         var queue = new Queue(this, qName, {
             queueName: qName, visibilityTimeout: Core.Duration.seconds(4), retentionPeriod: Core.Duration.days(14), 
-            deadLetterQueue: {queue: deadLetterqueue, maxReceiveCount: 5}, encryption: QueueEncryption.KMS, encryptionMasterKey:this.cmk
+            deadLetterQueue: {queue: deadLetterqueue, maxReceiveCount: 5}, encryption: QueueEncryption.KMS, encryptionMasterKey:this.keyAlias
             //,fifo: false
         });
         Core.Tags.of(queue).add(MetaData.NAME, qName);
