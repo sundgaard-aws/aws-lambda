@@ -25,15 +25,20 @@ var securityStack = new SecurityStack(app, MetaData.PREFIX+"security-stack", net
 var computeStack = new ComputeStack(app, MetaData.PREFIX+"compute-stack", networkStack.Vpc, securityStack.ApiSecurityGroup, securityStack.ApiRole, securityStack.cmk, props);
 var messageStack = new MessageStack(app, MetaData.PREFIX+"message-stack", { env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, key:securityStack.cmk });
 
-var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", securityStack.ApiRole, { env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, key:securityStack.cmk, sqsRequestEventTarget:messageStack.PaymentRequestQueue, sqsResponseEventTarget:messageStack.PaymentResponseQueue });
-var mediatorStack=new MediatorStack(app, MetaData.PREFIX+"mediator-stack", securityStack.ApiRole, { 
+var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", securityStack.ApiRole, { 
+    env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, 
+    key:securityStack.cmk 
+    //sqsRequestEventTarget:messageStack.PaymentRequestQueue, 
+    //sqsResponseEventTarget:messageStack.PaymentResponseQueue 
+});
+/*var mediatorStack=new MediatorStack(app, MetaData.PREFIX+"mediator-stack", securityStack.ApiRole, { 
     env: {account: process.env["CDK_DEFAULT_ACCOUNT"], region: region }, 
     key:securityStack.cmk, 
     sqsRequestEventTarget:messageStack.PaymentRequestQueue, 
     sqsResponseEventTarget:messageStack.PaymentResponseQueue,
     paymentRequestBucket: dataStack.PaymentRequestBucket,
     paymentResponseBucket: dataStack.PaymentResponseBucket
-});
+});*/
 
 //dataStack.addDependency(messageStack);
 //var dataStack=new DataStack(app, MetaData.PREFIX+"data-stack", props);

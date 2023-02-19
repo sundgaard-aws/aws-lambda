@@ -13,8 +13,8 @@ import { hasUncaughtExceptionCaptureCallback } from 'process';
 
 export interface DataStackProps extends StackProps {
     key: IKey;
-    sqsRequestEventTarget: IQueue;
-    sqsResponseEventTarget: IQueue;
+    //sqsRequestEventTarget: IQueue;
+    //sqsResponseEventTarget: IQueue;
 }
 
 export class DataStack extends Core.Stack {
