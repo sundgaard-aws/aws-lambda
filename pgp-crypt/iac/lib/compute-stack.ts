@@ -11,7 +11,7 @@ import { IKey } from '@aws-cdk/aws-kms';
 import IAM = require("@aws-cdk/aws-iam");
 
 export class ComputeStack extends Core.Stack {
-    private runtime:Lambda.Runtime = Lambda.Runtime.NODEJS_12_X;
+    private runtime:Lambda.Runtime = Lambda.Runtime.DOTNET_6;
     private cmk:IKey;
     private apiRole:IAM.IRole;
 
@@ -47,19 +47,19 @@ export class ComputeStack extends Core.Stack {
     } 
 
     private createArchivePaymentRequestFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Lambda.Function {
-        return this.createLambdaFunction(apiSecurityGroup, "ArchivePaymentRequestFunction", "index.handler", "../dotnet/LambdaHandler/", vpc);
+        return this.createLambdaFunction(apiSecurityGroup, "ArchivePaymentRequestFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
     }
 
     private createSendExternalPaymentRequestFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Lambda.Function {
-        return this.createLambdaFunction(apiSecurityGroup, "SendExternalPaymentRequestFunction", "index.handler", "../dotnet/LambdaHandler/", vpc);
+        return this.createLambdaFunction(apiSecurityGroup, "SendExternalPaymentRequestFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
     }
 
     private createReceiveExternalPaymentResponseFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Lambda.Function {
-        return this.createLambdaFunction(apiSecurityGroup, "ReceiveExternalPaymentResponseFunction", "index.handler", "../dotnet/LambdaHandler/", vpc);
+        return this.createLambdaFunction(apiSecurityGroup, "ReceiveExternalPaymentResponseFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
     }
 
     private createSendPaymentResponseDownstreamFunction(apiSecurityGroup: EC2.ISecurityGroup, vpc: EC2.IVpc) {
-        return this.createLambdaFunction(apiSecurityGroup, "SendPaymentResponseDownstreamFunction", "index.handler", "../dotnet/LambdaHandler/", vpc);
+        return this.createLambdaFunction(apiSecurityGroup, "SendPaymentResponseDownstreamFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
     }     
 
     private createLambdaCodeBucket()

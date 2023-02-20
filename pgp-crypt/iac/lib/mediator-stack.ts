@@ -25,12 +25,7 @@ export class MediatorStack extends Core.Stack {
         if(props==undefined) throw("Please make sure that the properties are initialized!");
         this.props=props;
         this.keyAlias=props?.key.addAlias(v4().toString());
-        this.addEvents();
+        //this.addEvents();
     }
-
-    private addEvents() {
-        this.props.paymentRequestBucket.addEventNotification(EventType.OBJECT_CREATED, new SqsDestination(this.props.sqsRequestEventTarget));
-        this.props.paymentResponseBucket.addEventNotification(EventType.OBJECT_CREATED, new SqsDestination(this.props.sqsRequestEventTarget));
-        //Core.Tags.of(bucket).add(MetaData.NAME, name);
-    }    
+    
 }

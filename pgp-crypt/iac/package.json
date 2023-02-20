@@ -33,6 +33,7 @@
     "@aws-cdk/aws-codepipeline-actions": "^1.192.0",
     "@aws-cdk/aws-dynamodb": "^1.192.0",
     "@aws-cdk/aws-ec2": "^1.192.0",
+    "@aws-cdk/aws-iam": "^1.192.0",
     "@aws-cdk/aws-kms": "^1.192.0",
     "@aws-cdk/aws-lambda": "^1.192.0",
     "@aws-cdk/aws-lambda-event-sources": "^1.192.0",

@@ -12,8 +12,12 @@
     <ItemGroup>    
       <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0"/>
       <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="2.1.0"/>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+      <ProjectReference Include="..\SL\SL.csproj"/>
       <ProjectReference Include="..\PGPCryptoService\PGPCryptoService.csproj"/>
-      <ProjectReference Include="..\FluentFTPService\FluentFTPService.csproj"/>
       <ProjectReference Include="..\AmazonS3Service\AmazonS3Service.csproj"/>
+      <ProjectReference Include="..\FluentFTPService\FluentFTPService.csproj"/>
+      <ProjectReference Include="..\OpenSSHService\OpenSSHService.csproj"/>
+      <ProjectReference Include="..\AWSSecretsManagerService\AWSSecretsManagerService.csproj"/>      
     </ItemGroup>
   </Project>
