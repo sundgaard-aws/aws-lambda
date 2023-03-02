@@ -10,6 +10,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.opusmagus.trade.bl.TradeBO;
 import com.opusmagus.trade.dtl.TradeDTO;
+
 import java.util.Map;
 
 public class FunctionHandler implements RequestHandler<Map<String,String>, String>{
@@ -23,11 +24,17 @@ public class FunctionHandler implements RequestHandler<Map<String,String>, Strin
   @Override
   public String handleRequest(Map<String,String> event, Context context)
   {
+    LambdaLogger logger = context.getLogger();
     String response = "200 OK";
-    TradeDTO newTrade = gson.fromJson(event.get("trade"), TradeDTO.class);
+    logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
+    logger.log("CONTEXT: " + gson.toJson(context));
+    logger.log("EVENT: " + gson.toJson(event));
+    logger.log("EVENT TYPE: " + event.getClass());
+    TradeDTO newTrade = new TradeDTO();
     try {
       tradeService.BookTrade(newTrade);
     } catch (Exception e) {
+      e.printStackTrace();
       response = "501 ERROR";
     }
     return response;
