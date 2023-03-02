@@ -11,6 +11,7 @@ import { SqsDestination } from '@aws-cdk/aws-s3-notifications';
 import * as SSM from '@aws-cdk/aws-ssm';
 import { SSMHelper } from './ssm-helper';
 
+
 export interface DataStackProps extends StackProps {
     key: IKey;
     //sqsRequestEventTarget: IQueue;
@@ -120,7 +121,7 @@ export class DataStack extends Core.Stack {
             principals: [new ServicePrincipal('s3.amazonaws.com'), new ServicePrincipal('sqs.amazonaws.com')],
             actions: ["kms:GenerateDataKey","kms:Decrypt"],
             resources: ["*"]
-        }));
+        }));        
     }
 
     private createRequestBucket():IBucket {
