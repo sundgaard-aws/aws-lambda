@@ -1,66 +1,82 @@
 import * as Core from '@aws-cdk/core';
-import EC2 = require('@aws-cdk/aws-ec2');
 import S3 = require('@aws-cdk/aws-s3');
 import Lambda = require('@aws-cdk/aws-lambda');
-import { ISecurityGroup, IVpc } from '@aws-cdk/aws-ec2';
+import { ISecurityGroup } from '@aws-cdk/aws-ec2';
 import { MetaData } from './meta-data';
 import { SSMHelper } from './ssm-helper';
 import { HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
-import { IKey } from '@aws-cdk/aws-kms';
+import * as APIGW_AUTH from '@aws-cdk/aws-apigatewayv2-authorizers';
 import IAM = require("@aws-cdk/aws-iam");
+import { IFunction } from '@aws-cdk/aws-lambda';
+import { HttpLambdaAuthorizer, HttpLambdaResponseType } from '@aws-cdk/aws-apigatewayv2-authorizers';
+import { Duration } from '@aws-cdk/core';
 
 export class ComputeStack extends Core.Stack {
     private runtime:Lambda.Runtime = Lambda.Runtime.DOTNET_6;
-    private cmk:IKey;
     private apiRole:IAM.IRole;
 
-    constructor(scope: Core.Construct, id: string, vpc: IVpc, apiSecurityGroup: ISecurityGroup, apiRole:IAM.IRole, cmk:IKey, props?: Core.StackProps) {
+    constructor(scope: Core.Construct, id: string, apiRole:IAM.IRole, props?: Core.StackProps) {
         super(scope, id, props);
         this.apiRole=apiRole;
-        this.createArchivePaymentRequestFunction(apiSecurityGroup, vpc);
-        this.createSendExternalPaymentRequestFunction(apiSecurityGroup, vpc);
-        this.createReceiveExternalPaymentResponseFunction(apiSecurityGroup, vpc);
-        this.createSendPaymentResponseDownstreamFunction(apiSecurityGroup, vpc);
+        this.createFunctions();
     }
 
-    private createLambdaFunction(apiSecurityGroup: ISecurityGroup, name:string, handlerMethod:string, assetPath:string, vpc:EC2.IVpc):Lambda.Function {
+    private createLambdaFunction(name:string, handlerMethod:string, assetPath:string, addRoute:boolean, authorizerFunction:IFunction|undefined):IFunction {
         var codeFromLocalZip = Lambda.Code.fromAsset(assetPath);
         var lambdaFunction = new Lambda.Function(this, MetaData.PREFIX+name, { 
-            functionName: MetaData.PREFIX+name, vpc: vpc, code: codeFromLocalZip, handler: handlerMethod, runtime: this.runtime, memorySize: 256, 
-            timeout: Core.Duration.seconds(20), role: this.apiRole, securityGroups: [apiSecurityGroup],
-            tracing: Lambda.Tracing.ACTIVE,
-            environmentEncryption: this.cmk
+            functionName: MetaData.PREFIX+name, code: codeFromLocalZip, handler: handlerMethod, runtime: this.runtime, memorySize: 256, 
+            timeout: Core.Duration.seconds(20), role: this.apiRole,
+            tracing: Lambda.Tracing.ACTIVE
         });
         
         const lambdaIntegration = new HttpLambdaIntegration(MetaData.PREFIX+name+"-lam-int", lambdaFunction);        
         const httpApi = new HttpApi(this, MetaData.PREFIX+name+"-api");
         
-        httpApi.addRoutes({
-        path: "/" + name,
-        methods: [ HttpMethod.POST, HttpMethod.OPTIONS ],
-        integration: lambdaIntegration,
-        });
+        if(authorizerFunction) {
+            var authorizer=this.buildAuthorizer(authorizerFunction);
+            httpApi.addRoutes({
+                path: "/" + name,
+                methods: [ HttpMethod.POST, HttpMethod.OPTIONS ],
+                integration: lambdaIntegration,
+                authorizer: authorizer
+            });        
+        }
+        else {
+            httpApi.addRoutes({
+                path: "/" + name,
+                methods: [ HttpMethod.POST, HttpMethod.OPTIONS ],
+                integration: lambdaIntegration,
+                
+            });   
+        }     
         
         Core.Tags.of(lambdaFunction).add(MetaData.NAME, MetaData.PREFIX+name);
         return lambdaFunction;
     } 
 
-    private createArchivePaymentRequestFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Lambda.Function {
-        return this.createLambdaFunction(apiSecurityGroup, "ArchivePaymentRequestFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
+    private buildAuthorizer(authorizerFunction: Lambda.IFunction) {
+        /*new APIGW_AUTH.HttpJwtAuthorizer("", "demo-jwt-issuer", {
+            
+        });*/
+        var authorizer=new HttpLambdaAuthorizer("MyAuthorizer", authorizerFunction, {
+            authorizerName: "MyAuthorizer",
+            identitySource:["$request.header.Authorization"],
+            responseTypes:[HttpLambdaResponseType.IAM],
+            resultsCacheTtl:Duration.seconds(15)
+        });
+        /*const auth = new TokenAuthorizer(this,'NewRequestAuthorizer',{
+                handler:authFunc,
+                identitySource:'method.request.header.AuthorizeToken'
+                
+        })*/
+        return authorizer;
     }
 
-    private createSendExternalPaymentRequestFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Lambda.Function {
-        return this.createLambdaFunction(apiSecurityGroup, "SendExternalPaymentRequestFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
+    private createFunctions() {
+        var authorizer=this.createLambdaFunction("LambdaAuthorizerFunction", "LambdaAuthorizerAPI::OM.AWS.Demo.API.FunctionHandler::Invoke", "../dotnet/LambdaAuthorizerAPI/publish", false, undefined);
+        return this.createLambdaFunction("ProcessOrderFunction", "ProcessOrderAPI::OM.AWS.Demo.API.FunctionHandler::Invoke", "../dotnet/ProcessOrderAPI/publish/", true, authorizer);
     }
-
-    private createReceiveExternalPaymentResponseFunction(apiSecurityGroup: ISecurityGroup, vpc: IVpc):Lambda.Function {
-        return this.createLambdaFunction(apiSecurityGroup, "ReceiveExternalPaymentResponseFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
-    }
-
-    private createSendPaymentResponseDownstreamFunction(apiSecurityGroup: EC2.ISecurityGroup, vpc: EC2.IVpc) {
-        return this.createLambdaFunction(apiSecurityGroup, "SendPaymentResponseDownstreamFunction", "LambdaHandler::PGPCrypt.API.FunctionHandler::Invoke", "../dotnet/LambdaHandler/LambdaHandler.zip", vpc);
-    }     
 
     private createLambdaCodeBucket()
     {

@@ -1,4 +1,6 @@
 bin
+obj
+publish
 build
 package-lock.json
 cdk-context.json

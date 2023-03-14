@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OM.AWS.Demo.Config;
 using static Amazon.Lambda.APIGatewayEvents.APIGatewayCustomAuthorizerPolicy;
 
-namespace OM.AWS.Demo.BL.API {
+namespace OM.AWS.Demo.API {
     public class FunctionHandler {
         private static ServiceProvider serviceProvider;
         static FunctionHandler() {
@@ -17,6 +17,7 @@ namespace OM.AWS.Demo.BL.API {
         [LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
         public async Task<APIGatewayCustomAuthorizerResponse> Invoke(APIGatewayCustomAuthorizerRequest apiGatewayCustomAuthorizerRequest) {
             Console.WriteLine("Lambda Authorizer Invoke() called...");
+            Console.WriteLine($"Auth token is [{apiGatewayCustomAuthorizerRequest.AuthorizationToken}])");
             var effect="Deny";
             if(apiGatewayCustomAuthorizerRequest.AuthorizationToken=="demo123") effect="Allow";
             return new APIGatewayCustomAuthorizerResponse {

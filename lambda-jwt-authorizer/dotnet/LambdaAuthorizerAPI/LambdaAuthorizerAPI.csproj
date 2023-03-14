@@ -3,6 +3,10 @@
       <TargetFramework>net6.0</TargetFramework>
       <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
       <AWSProjectType>Lambda</AWSProjectType>
+      <PublishDir>publish</PublishDir>
+      <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+      <PackageId>lambda-handler</PackageId>
+      <Version>1.0.0</Version>
     </PropertyGroup>
     <ItemGroup>    
       <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0"/>
