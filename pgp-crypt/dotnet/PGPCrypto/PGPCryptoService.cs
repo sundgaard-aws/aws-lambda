@@ -4,7 +4,7 @@ using PgpCore;
 
 namespace PGPCrypto
 {
-    public class PGPCryptFacade
+    public class PGPCryptoService
     {
         private const string PGPPublicKeyName="pgp-public.key";
         private const string PGPPrivateKeyName="pgp-private.key";

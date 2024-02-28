@@ -2,7 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SL\SL.csproj"/>
     <ProjectReference Include="..\DTL\DTL.csproj"/>
-    <ProjectReference Include="..\PGPCryptoService\PGPCryptoService.csproj"/>
+    <ProjectReference Include="..\PGPCrypto\PGPCrypto.csproj"/>
     <ProjectReference Include="..\AmazonS3Service\AmazonS3Service.csproj"/>
     <ProjectReference Include="..\FluentFTPService\FluentFTPService.csproj"/>
     <ProjectReference Include="..\OpenSSHService\OpenSSHService.csproj"/>
